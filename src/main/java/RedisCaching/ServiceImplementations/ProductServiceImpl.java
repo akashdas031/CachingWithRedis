@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	@CachePut(value="Product",key="#root.args[0]")
+	@CachePut(value="product",key="#result.productId")
 	@Transactional
 	public Product createProduct(Product product) {
 		String prodId = UUID.randomUUID().toString().substring(10).replaceAll("-", "").trim();
@@ -43,14 +43,15 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	@Cacheable(value="product",key="#root.args[0]")
+	@CachePut(value="product",key="#productId")
 	public Product getSinleProduct(String productId) {
+		
 		logger.info("ProductDetails Fetch from the DB......");
 		return this.productRepo.findById(productId).orElseThrow(()-> new RuntimeException("User With Given Id is Not available in the server"));
 	}
 
 	@Override
-	@CachePut(value="product",key="#root.args[1]")
+	@CachePut(value="product",key="#productId")
 	public Product updateProduct(Product product, String productId) {
 		Product existingProduct = this.productRepo.findById(productId).orElseThrow(()-> new RuntimeException("Product with Id not exist in the server...can't update"));
 		existingProduct.setProductName(product.getProductName());
@@ -59,7 +60,7 @@ public class ProductServiceImpl implements ProductService{
 	}
 
 	@Override
-	@CacheEvict(value="Product",key="#root.args[0]",allEntries = true)
+	@CacheEvict(value="product",key="#productId",allEntries = true)
 	public boolean removeProduct(String productId) {
 		this.productRepo.deleteById(productId);
 		return this.productRepo.existsById(productId);

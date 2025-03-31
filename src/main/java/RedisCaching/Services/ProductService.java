@@ -2,6 +2,8 @@ package RedisCaching.Services;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
+
 import RedisCaching.Entities.Product;
 
 public interface ProductService {
