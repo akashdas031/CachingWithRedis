@@ -7,6 +7,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
+import org.springframework.data.redis.stream.StreamReceiver;
+
+import RedisCaching.Entities.Product;
 
 @Configuration
 public class CacheConfig {
@@ -16,4 +26,34 @@ public class CacheConfig {
 		RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)).disableCachingNullValues();
 		return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration).build();
 	}
+	
+	//Redis Template
+	@Bean
+	public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+		RedisTemplate<String, Object> redisTemplate=new RedisTemplate<>();
+		redisTemplate.setConnectionFactory(redisConnectionFactory);
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+		redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+		return redisTemplate;
+	}
+	@Bean
+	public RedisTemplate<String,Product> redisTemplateN(RedisConnectionFactory redisConnectionFactory){
+		RedisTemplate<String, Product> redisTemplate=new RedisTemplate<>();
+		redisTemplate.setConnectionFactory(redisConnectionFactory);
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+		redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+		return redisTemplate;
+	}
+	
+//	//Redis Stream Reciever
+//	public StreamMessageListenerContainer<String,MapRecord<String,String,String>> streamReciever(RedisConnectionFactory redisConnectionFactory){
+//		StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions.builder().pollTimeout(Duration.ofSeconds(1)).build();
+//	    StreamMessageListenerContainer<String, MapRecord<String,String,String>> container=StreamMessageListenerContainer.create(redisConnectionFactory,options);
+//	    StreamReceiver<String,MapRecord<String,String,String>> reviever=StreamReceiver.create(redisConnectionFactory);
+//	
+//	}
 }
