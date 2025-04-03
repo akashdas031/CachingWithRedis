@@ -7,16 +7,22 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.ReadOffset;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
 import org.springframework.data.redis.stream.StreamReceiver;
+import org.springframework.data.redis.stream.Subscription;
 
 import RedisCaching.Entities.Product;
+import RedisCaching.RedisDataStorageTypes.RedisStreamSubscriber;
 
 @Configuration
 public class CacheConfig {
@@ -49,11 +55,18 @@ public class CacheConfig {
 		return redisTemplate;
 	}
 	
-//	//Redis Stream Reciever
-//	public StreamMessageListenerContainer<String,MapRecord<String,String,String>> streamReciever(RedisConnectionFactory redisConnectionFactory){
-//		StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options = StreamMessageListenerContainerOptions.builder().pollTimeout(Duration.ofSeconds(1)).build();
-//	    StreamMessageListenerContainer<String, MapRecord<String,String,String>> container=StreamMessageListenerContainer.create(redisConnectionFactory,options);
-//	    StreamReceiver<String,MapRecord<String,String,String>> reviever=StreamReceiver.create(redisConnectionFactory);
-//	
-//	}
+	@Bean
+	public Subscription redisSubscriber(RedisConnectionFactory redisConnectionFactory,RedisStreamSubscriber subscriber,StringRedisTemplate redisTemplate) {
+		//createConsumerGroup(redisConnectionFactory,redisTemplate);
+		StreamMessageListenerContainerOptions<String, MapRecord<String,String,String>> options=StreamMessageListenerContainerOptions.builder()
+																											.pollTimeout(Duration.ofSeconds(1)).batchSize(10).build();
+		StreamMessageListenerContainer<String,MapRecord<String,String,String>> container=StreamMessageListenerContainer.create(redisConnectionFactory, options);
+		Subscription subscription=container.receive(
+				Consumer.from("Product-Group", "Consumer-1"),
+				StreamOffset.create("Product-Stream",ReadOffset.lastConsumed()),
+				subscriber
+				);
+		container.start();
+		return subscription;
+	}
 }

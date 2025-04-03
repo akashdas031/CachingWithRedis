@@ -1,5 +1,8 @@
 package RedisCaching;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +18,7 @@ import RedisCaching.RedisDataStorageTypes.RedisHashService;
 import RedisCaching.RedisDataStorageTypes.RedisListService;
 import RedisCaching.RedisDataStorageTypes.RedisSetService;
 import RedisCaching.RedisDataStorageTypes.RedisSortedSetService;
+import RedisCaching.RedisDataStorageTypes.RedisStreamPublisher;
 //import RedisCaching.RedisDataStorageTypes.RedisStreamPublisherService;
 
 @SpringBootApplication
@@ -26,14 +30,14 @@ public class CachingWithRedisApplication implements CommandLineRunner{
 	private RedisSetService redisSet;
 	private RedisSortedSetService redisSortedSet;
 	private RedisHashService redisHash;
-	//private RedisStreamPublisherService redisStreamP;
+	private RedisStreamPublisher redisStreamP;
 	public CachingWithRedisApplication(RedisListService redisList,RedisSetService redisSet,RedisSortedSetService redisSortedSet,
-			RedisHashService redisHash) {
+			RedisHashService redisHash,RedisStreamPublisher redisStreamP) {
 		this.redisList=redisList;
 		this.redisSet=redisSet;
 		this.redisSortedSet=redisSortedSet;
 		this.redisHash=redisHash;
-		//this.redisStreamP=redisStreamP;
+		this.redisStreamP=redisStreamP;
 	}
 	
 	public static void main(String[] args) {
@@ -77,6 +81,22 @@ public class CachingWithRedisApplication implements CommandLineRunner{
 ////	    logger.info("Top Products from the Sorted Set : "+topNProducts);
 //	    this.redisSortedSet.removeProductFromRedisSortedSet("PR-2");
 //	    logger.info("Prodcut Removed from the Server...");
+//		this.redisStreamP.publishProduct(product1);
+//		logger.info("Product Published Successfully...");
+//		logger.info("----------------------------------------");
+//		
+	    logger.info("Total Number of Processor available for JVM : "+ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors());
+	    Process process=Runtime.getRuntime().exec("wmic path Win32_Battery get EstimatedChargeRemaining");
+		BufferedReader reader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+		while((line=reader.readLine())!= null) {
+			line=line.trim();
+			if(line.matches("\\d+")) {
+				logger.info("Charge Remaining in my Laptop is : "+line+"%");
+			}
+		}
+		
+	    
 	
 	}
 
