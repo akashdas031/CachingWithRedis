@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
@@ -20,9 +22,11 @@ public class ProductServiceImpl implements ProductService{
 	private Logger logger=LoggerFactory.getLogger(ProductServiceImpl.class);
 	
 	private ProductRepo productRepo;
+	private CacheManager cacheManager;
 	
-	public ProductServiceImpl(ProductRepo productRepo) {
+	public ProductServiceImpl(ProductRepo productRepo,CacheManager cacheManager) {
 		this.productRepo=productRepo;
+		this.cacheManager=cacheManager;
 	}
 
 	@Override
@@ -63,6 +67,19 @@ public class ProductServiceImpl implements ProductService{
 		this.productRepo.deleteById(productId);
 		return this.productRepo.existsById(productId);
 		
+	}
+
+	@Override
+	public List<Product> getProductsByProductName(String productName) {
+		List<Product> product= this.productRepo.findByProductName(productName);
+		Cache cache = this.cacheManager.getCache("productId");
+		if(cache != null) {
+			cache.put(product, "productId");
+		}else {
+			logger.info("Product with given details was not in the cache...fetched from db and added in cache...");
+			cache.put(product, "productId");
+		}
+		return product;
 	}
 
 }

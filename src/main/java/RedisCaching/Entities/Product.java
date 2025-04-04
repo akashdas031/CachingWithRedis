@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
+@Table(indexes= {@Index(name="product_index",columnList="productName")})
 public class Product implements Serializable{
 	
 	@Id

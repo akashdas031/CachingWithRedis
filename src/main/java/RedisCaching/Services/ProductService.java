@@ -12,4 +12,5 @@ public interface ProductService {
 	Product getSinleProduct(String productId);
 	Product updateProduct(Product product,String productId);
 	boolean removeProduct(String productId);
+	List<Product> getProductsByProductName(String productName);
 }

@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 import RedisCaching.Entities.Product;
+import RedisCaching.RedisDataStorageTypes.RedisGeospatialService;
 import RedisCaching.RedisDataStorageTypes.RedisHashService;
 import RedisCaching.RedisDataStorageTypes.RedisListService;
 import RedisCaching.RedisDataStorageTypes.RedisSetService;
@@ -31,13 +32,15 @@ public class CachingWithRedisApplication implements CommandLineRunner{
 	private RedisSortedSetService redisSortedSet;
 	private RedisHashService redisHash;
 	private RedisStreamPublisher redisStreamP;
+	private RedisGeospatialService redisGeo;
 	public CachingWithRedisApplication(RedisListService redisList,RedisSetService redisSet,RedisSortedSetService redisSortedSet,
-			RedisHashService redisHash,RedisStreamPublisher redisStreamP) {
+			RedisHashService redisHash,RedisStreamPublisher redisStreamP,RedisGeospatialService redisGeo) {
 		this.redisList=redisList;
 		this.redisSet=redisSet;
 		this.redisSortedSet=redisSortedSet;
 		this.redisHash=redisHash;
 		this.redisStreamP=redisStreamP;
+		this.redisGeo=redisGeo;
 	}
 	
 	public static void main(String[] args) {
@@ -85,18 +88,24 @@ public class CachingWithRedisApplication implements CommandLineRunner{
 //		logger.info("Product Published Successfully...");
 //		logger.info("----------------------------------------");
 //		
-	    logger.info("Total Number of Processor available for JVM : "+ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors());
-	    Process process=Runtime.getRuntime().exec("wmic path Win32_Battery get EstimatedChargeRemaining");
-		BufferedReader reader=new BufferedReader(new InputStreamReader(process.getInputStream()));
-		String line;
-		while((line=reader.readLine())!= null) {
-			line=line.trim();
-			if(line.matches("\\d+")) {
-				logger.info("Charge Remaining in my Laptop is : "+line+"%");
-			}
-		}
-		
-	    
+//	    logger.info("Total Number of Processor available for JVM : "+ManagementFactory.getOperatingSystemMXBean().getAvailableProcessors());
+//	    Process process=Runtime.getRuntime().exec("wmic path Win32_Battery get EstimatedChargeRemaining");
+//		BufferedReader reader=new BufferedReader(new InputStreamReader(process.getInputStream()));
+//		String line;
+//		while((line=reader.readLine())!= null) {
+//			line=line.trim();
+//			if(line.matches("\\d+")) {
+//				logger.info("Charge Remaining in my Laptop is : "+line+"%");
+//			}
+//		}
+		this.redisGeo.addLocation("Bhubaneswar Railway Station", 20.2697, 85.8333);
+		this.redisGeo.addLocation("Utkal University", 20.2736, 85.8401);
+		this.redisGeo.addLocation("KIIT University", 20.3556, 85.8171);
+		this.redisGeo.addLocation("Khandagiri", 20.2703, 85.7696);
+		this.redisGeo.addLocation("Master Canteen", 20.2695, 85.8414);
+	    logger.info("Locations addedd................................");
+	    List<Object> nearByLocation = this.redisGeo.getNearByLocation(20.2697, 85.8333, 5);
+	    logger.info("Locations within 5 Kms are : "+nearByLocation);
 	
 	}
 

@@ -67,5 +67,11 @@ public class ProductController {
 			return new ResponseEntity<Map<String,String>>(map,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/getProductByName/{productName}")
+	public ResponseEntity<List<Product>> getProductsWithName(@PathVariable("productName") String productName){
+		List<Product> product = this.productServ.getProductsByProductName(productName);
+		return new ResponseEntity<List<Product>>(product,HttpStatus.OK);
+	}
 
 }
