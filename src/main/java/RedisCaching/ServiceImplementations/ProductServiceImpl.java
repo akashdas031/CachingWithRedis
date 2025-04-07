@@ -58,6 +58,7 @@ public class ProductServiceImpl implements ProductService{
 		Product existingProduct = this.productRepo.findById(productId).orElseThrow(()-> new RuntimeException("Product with Id not exist in the server...can't update"));
 		existingProduct.setProductName(product.getProductName());
 		existingProduct.setProductDEscription(product.getProductDEscription());
+		existingProduct.setProductPrice(product.getProductPrice());
 		return this.productRepo.save(existingProduct);
 	}
 

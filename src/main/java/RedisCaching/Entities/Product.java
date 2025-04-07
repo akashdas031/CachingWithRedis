@@ -2,6 +2,8 @@ package RedisCaching.Entities;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
@@ -27,4 +29,6 @@ public class Product implements Serializable{
 	private String productId;
 	private String productName;
 	private String productDEscription;
+	@ColumnDefault(value="0.0")
+	private double productPrice;
 }
